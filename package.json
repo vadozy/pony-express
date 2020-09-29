@@ -16,5 +16,8 @@
     "eslint-plugin-jest": "^24.0.2",
     "jest": "^26.4.2",
     "nodemon": "^2.0.4"
+  },
+  "dependencies": {
+    "express": "^4.17.1"
   }
 }
