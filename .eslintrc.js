@@ -4,6 +4,9 @@ module.exports = {
     node: true,
     es6: true,
   },
+  parserOptions: {
+    ecmaVersion: 2018,
+  },
   rules: {
     quotes: ['error', 'single', { avoidEscape: true }],
     'comma-dangle': [
@@ -16,6 +19,9 @@ module.exports = {
         functions: 'only-multiline',
       },
     ],
-    'no-unused-vars': ['error', { varsIgnorePattern: '^_' }],
+    'no-unused-vars': [
+      'error',
+      { varsIgnorePattern: '^_', argsIgnorePattern: '^_' },
+    ],
   },
 };

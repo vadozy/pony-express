@@ -13,7 +13,7 @@ let getUserRoute = (req, res) => {
   res.send(user);
 };
 
-usersRouter.get('/users', getUsersRoute);
-usersRouter.get('/users/:id', getUserRoute);
+usersRouter.get('/', getUsersRoute);
+usersRouter.get('/:id', getUserRoute);
 
 module.exports = usersRouter;
