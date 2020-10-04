@@ -4,6 +4,7 @@ const emails = require('../fixtures/emails');
 const generateId = require('../lib/generate-id');
 const bodyParser = require('body-parser');
 const multer = require('multer'); // for file uploads
+const requireAuth = require('../lib/require-auth');
 
 const emailsRouter = express.Router();
 const upload = multer({ dest: path.join(__dirname, '../uploads') });
@@ -29,11 +30,13 @@ const updateEmailRoute = async (req, res) => {
   res.send(email);
 };
 
-let deleteEmailRoute = (req, res) => {
+const deleteEmailRoute = (req, res) => {
   const index = emails.findIndex(email => email.id === req.params.id);
   emails.splice(index, 1);
   res.sendStatus(204);
 };
+
+emailsRouter.use(requireAuth);
 
 emailsRouter.get('/', getEmailsRoute);
 emailsRouter.post(

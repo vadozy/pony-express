@@ -2,6 +2,8 @@ const logger = require('./lib/logger');
 const path = require('path');
 const compress = require('compression');
 const serveStatic = require('serve-static');
+const basicAuth = require('./lib/basic-auth');
+const findUser = require('./lib/find-user');
 
 const express = require('express');
 
@@ -15,6 +17,7 @@ app.use(compress(/* { threshold: 0 } */)); // default threshold is 1kb, make it 
 app.use(serveStatic(path.join(__dirname, 'public')));
 app.use('/uploads', serveStatic(path.join(__dirname, 'uploads')));
 
+app.use(basicAuth(findUser.byCredentials));
 app.use('/users', usersRouter);
 app.use('/emails', emailsRouter);
 
