@@ -1,10 +1,11 @@
 const path = require('path');
 const express = require('express');
 const emails = require('../fixtures/emails');
-const generateId = require('../lib/generate-id');
 const bodyParser = require('body-parser');
 const multer = require('multer'); // for file uploads
 const requireAuth = require('../lib/require-auth');
+const generateId = require('../lib/generate-id');
+const enforce = require('../lib/enforce');
 
 const emailsRouter = express.Router();
 const upload = multer({ dest: path.join(__dirname, '../uploads') });
@@ -12,6 +13,9 @@ const upload = multer({ dest: path.join(__dirname, '../uploads') });
 const getEmailsRoute = (req, res) => {
   res.send(emails);
 };
+
+const updateEmailPolicy = (user, email) => user.id === email.from;
+const deleteEmailPolicy = (user, email) => user.id === email.to;
 
 const createEmailRoute = async (req, res) => {
   const attachments = (req.files || []).map(file => file.filename);
@@ -22,9 +26,10 @@ const createEmailRoute = async (req, res) => {
   res.send(newEmail);
 };
 
-const updateEmailRoute = async (req, res) => {
+const updateEmailRoute = (req, res) => {
   const body = req.body;
   const email = emails.find(email => email.id === req.params.id);
+  req.authorize(email);
   Object.assign(email, body);
   res.status(200);
   res.send(email);
@@ -32,6 +37,7 @@ const updateEmailRoute = async (req, res) => {
 
 const deleteEmailRoute = (req, res) => {
   const index = emails.findIndex(email => email.id === req.params.id);
+  req.authorize(emails[index]);
   emails.splice(index, 1);
   res.sendStatus(204);
 };
@@ -45,7 +51,12 @@ emailsRouter.post(
   upload.array('attachments'),
   createEmailRoute
 );
-emailsRouter.patch('/:id', bodyParser.json(), updateEmailRoute);
-emailsRouter.delete('/:id', deleteEmailRoute);
+emailsRouter.patch(
+  '/:id',
+  enforce(updateEmailPolicy),
+  bodyParser.json(),
+  updateEmailRoute
+);
+emailsRouter.delete('/:id', enforce(deleteEmailPolicy), deleteEmailRoute);
 
 module.exports = emailsRouter;
